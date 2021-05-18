@@ -37,7 +37,7 @@ int openGate(){
   Serial.println("Open Gate Started");
   //if (digitalRead(gateCloseRelayContact) == LOW){
     digitalWrite(gateCloseRelayContact, HIGH);
-    delay(500);
+    delay(1000);
   //}
   digitalWrite(gateOpenRelayContact, LOW);
   startOpenMillis = millis(); // begins the counter to auto-close the gate
