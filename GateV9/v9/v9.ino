@@ -8,8 +8,10 @@ const int gateCloseRelayContact = 7; // used to close an external relay that is 
 const int lightRelayContact = 8; // the light turns on when the gate is open, opening, or closing
 long unsigned startOpenMillis = 0; // counter used to auto close the gate after xx seconds
 long unsigned startCounter = 0;
+long unsigned proxStartCounter = 0;
 int position = 4;
 int forceOpen = 0;
+int prox =0;
 /*
  * 1= opening
  * 2= open
@@ -81,7 +83,6 @@ if (position == 3 && digitalRead(openSwitch) == HIGH){
 // monitor for remote signal
 if ((digitalRead(openSignal) == HIGH)) {
   Serial.println("Gate signal received");
-  delay(1000);
   if(forceOpen == 1){
     forceOpen = 0;
     position = closeGate();
@@ -103,8 +104,11 @@ if ((digitalRead(openSignal) == HIGH)) {
     Serial.println("case 4");
       position = openGate(); 
       break;
-  };
-  }}
+    };
+  }
+  delay(1000);
+  prox = 2;
+}
 
 // monitor for forced open signal
 if ((digitalRead(stayOpenSignal)) == HIGH){
@@ -118,10 +122,23 @@ if ((digitalRead(stayOpenSignal)) == HIGH){
 }
 
 // Proximity sensor
-if (digitalRead(proxSensor) == HIGH && (position == 3 || position == 4)) {
+// The prox sensor will keep the internal relay closed for about 4 seconds
+// and this causes problems when pushing the remote close button when you leave 
+// as the relay is still closed causing the gate to remain open.
+
+if (digitalRead(proxSensor) == HIGH && prox != 2 && (position == 3 || position == 4)) {
   Serial.println("Prox sensor received, opening gate");
-  position = openGate();
+  //position = openGate();
+  prox = 1;
+  proxStartCounter = millis();
   }
+if (prox == 1){
+  position = openGate();
+}
+if ((millis() - proxStartCounter) > 4000){
+  prox = 0;
+}
+
 
 // Auto close
 if (position == 2 && forceOpen == 0){
