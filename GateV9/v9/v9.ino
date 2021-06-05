@@ -112,6 +112,7 @@ if ((digitalRead(openSignal) == HIGH)) {
 
 // monitor for forced open signal
 if ((digitalRead(stayOpenSignal)) == HIGH){
+  Serial.println("Forced open signal received");
   if (forceOpen == 0){
     forceOpen = 1;
     position = openGate();
@@ -133,9 +134,11 @@ if (digitalRead(proxSensor) == HIGH && prox != 2 && (position == 3 || position =
   proxStartCounter = millis();
   }
 if (prox == 1){
+  Serial.println("prox = 1 and opening gate");
   position = openGate();
 }
-if ((millis() - proxStartCounter) > 4000){
+if ((millis() - proxStartCounter) > 4000 && position == 4){
+  Serial.println("reset prox variable to 0");
   prox = 0;
 }
 
